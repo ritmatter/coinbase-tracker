@@ -1,12 +1,13 @@
-# IMPORTS
+import json
+import os
 from coinbase.wallet.client import Client
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
 # CREDENTIALS
-key = 'YOUR_COINBASE_API_KEY'
-scrt = 'YOUR_COINBASE_API_SECRET'
-google_creds = "YOUR_GOOGLE_CREDENTIALS_FILENAME.json"
+key = os.environ.get('COINBASE_KEY')
+scrt = os.environ.get('COINBASE_SECRET')
+google_creds = os.environ.get('GOOGLE_COINBASE_CREDS')
 
 # ALL FUNCTIONS
 def create_coinbase_client(key,scrt):
@@ -199,16 +200,15 @@ def pull_cb_account_info(client):
     print("\n=====Coinbase account information gathered=====\n")
     return my_coinbase
 
-def connect_to_google_ss(google_creds_filename, ss_name):
+def connect_to_google_ss(google_creds, ss_name):
     print("3. Connecting to Google Sheets...")
 
-    scope = ['https://spreadsheets.google.com/feeds',
+    scopes = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
-
-    credentials = (ServiceAccountCredentials
-                   .from_json_keyfile_name(google_creds_filename,
-                                           scope)
-                  )
+    service_account_info = json.loads(google_creds)
+    credentials = (
+        Credentials.from_service_account_info(
+            service_account_info, scopes=scopes))
     gc = gspread.authorize(credentials)
     spreadsheet = gc.open(ss_name)
     return spreadsheet
@@ -389,7 +389,7 @@ my_coinbase = pull_cb_account_info(client)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Connect to google spreadsheets and fill info
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-spreadsheet = connect_to_google_ss(google_creds_filename,"Coinbase Portfolio")
+spreadsheet = connect_to_google_ss(google_creds,"Coinbase Portfolio")
 # Filling out first sheet, portfolio overview
 generate_portfolio_overview(my_coinbase, spreadsheet)
 # Filling out second sheet, wallet details

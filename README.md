@@ -1,4 +1,9 @@
-# coinbase-tracker
+# Coinbase Tracker Dockerized
+
+A fork of the original `coinbase-tracker` that is Dockerized so that it can be run anywhere.
+Private information is also moved to environment variables for improved security.
+
+# coinbase-tracker Original README
 Created this script to track all of my Coinbase cryptocurrencies in one custom dashboard. In this dashboard I am able to track:
 * Realized and unrealized for all of my cryptocurrency investments
 * % Return on each of my cryptocurrencies
